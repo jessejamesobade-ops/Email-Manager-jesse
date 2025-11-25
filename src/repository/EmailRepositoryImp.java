@@ -20,7 +20,27 @@ public class EmailRepositoryImp implements EmailRepository {
 
     @Override
     public boolean save(Email email) {
-        return false;
+        String sql = "INSERT INTO emails (message_Id, sender, subject, snippet, received_at) VALUES (?, ?, ?, ?, ?)";
+
+        try(Connection conn = DriverManager.getConnection(url, username,password);
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setString(1,email.getMessageId());
+            stmt.setString(2,email.getSender());
+            stmt.setString(3,email.getSubject());
+            stmt.setString(4,email.getSnippet());
+            stmt.setTimestamp(5,Timestamp.valueOf(email.getReceivedAt()));
+
+            int affected = stmt.executeUpdate();
+
+            System.out.println("connected [good]");
+
+            return affected > 0;
+        } catch(SQLException e) {
+              e.printStackTrace();
+            System.out.println("connected [ X ]");
+            return false;
+        }
     }
 
     @Override
