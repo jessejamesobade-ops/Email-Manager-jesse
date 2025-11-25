@@ -45,12 +45,60 @@ public class EmailRepositoryImp implements EmailRepository {
 
     @Override
     public Email findById(String messageId) {
-        return null;
+
+        String sql = "SELECT message_Id, sender, subject, snippet, received_at FROM emails WHERE message_Id = ?";
+
+        try(Connection conn = DriverManager.getConnection(url, username, password);
+        PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setString(1, messageId);
+
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next()) {
+                    return new Email(
+
+                            rs.getString("message_Id"),
+                            rs.getString("sender"),
+                            rs.getString("subject"),
+                            rs.getString("snippet"),
+                            rs.getTimestamp("received_at").toLocalDateTime()
+
+                    );
+                }
+            }
+            return  null;
+
+        }catch (SQLException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public List<Email> findAll() {
-        return new ArrayList<>();
+
+        String sql = "SELECT message_Id, sender, subject, snippet, received_at FROM emails";
+        List<Email> emails = new ArrayList<>();
+
+        try(Connection conn = DriverManager.getConnection(url, username, password);
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()){
+
+            while (rs.next()){
+                Email email = new Email(
+                        rs.getString("message_Id"),
+                        rs.getString("sender"),
+                        rs.getString("subject"),
+                        rs.getString("snippet"),
+                        rs.getTimestamp("received_at").toLocalDateTime());
+
+                 emails.add(email);
+              }
+            } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return emails;
     }
 
     @Override
