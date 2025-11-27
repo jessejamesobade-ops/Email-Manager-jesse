@@ -103,6 +103,20 @@ public class EmailRepositoryImp implements EmailRepository {
 
     @Override
     public boolean delete(String messageId) {
-        return false;
+
+        String sql = "DELETE FROM emails WHERE message_Id = ?";
+
+        try(Connection conn = DriverManager.getConnection(url, username, password);
+        PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setString(1, messageId);
+
+            int affected =  stmt.executeUpdate();
+            return affected > 0;
+
+        }catch(SQLException e){
+            e.printStackTrace();
+            return false;
+        }
     }
 }

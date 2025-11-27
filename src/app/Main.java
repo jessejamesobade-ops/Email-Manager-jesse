@@ -14,7 +14,7 @@ public class Main {
                 );
 
         Email email = new Email(
-                "123abc",
+                "1234abc",
                 "tester@example.com",
                 "Hello world",
                 "This is a test snippet",
@@ -26,6 +26,10 @@ public class Main {
 
         Email e = repo.findById("123abc");
         System.out.println(e);
+
+
+        boolean deleted = repo.delete("123abc");
+        System.out.println("DELETED: "+deleted);
 
     }
 }
