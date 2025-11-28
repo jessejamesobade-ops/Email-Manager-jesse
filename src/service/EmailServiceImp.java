@@ -16,6 +16,7 @@ public class EmailServiceImp implements EmailService {
 
     @Override
     public Email saveEmail(Email email) {
+
         if (email == null) {
             System.out.println("Cannot save null email.");
             return null;
@@ -25,9 +26,8 @@ public class EmailServiceImp implements EmailService {
             return null;
         }
 
-        boolean saved = emailRepository.save(email);
-        return saved ? email : null;
-
+        Email saved = emailRepository.save(email);
+        return emailRepository.save(email);
     }
 
     @Override
