@@ -44,7 +44,6 @@ public class Main {
         }*/
 
         Email email = new Email(
-                "123abc",
                 "tester@example.com",
                 "Hello world",
                 "This is a test snippet",

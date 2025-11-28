@@ -27,7 +27,7 @@ public class EmailServiceImp implements EmailService {
         }
 
         Email saved = emailRepository.save(email);
-        return emailRepository.save(email);
+        return saved;
     }
 
     @Override

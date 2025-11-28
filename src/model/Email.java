@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Email {
 
@@ -12,7 +13,13 @@ public class Email {
     private LocalDateTime receivedAt;
 
     //empty constructors
-   public Email(){}
+   public Email(String sender, String subject, String snippet, LocalDateTime receivedAt){
+       this.messageId = UUID.randomUUID().toString();
+       this.sender = sender;
+       this.subject = subject;
+       this.snippet = snippet;
+       this.receivedAt = receivedAt;
+   }
 
     //full constructor
     public Email(String messageId, String sender, String subject, String snippet, LocalDateTime receivedAt){
