@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface EmailRepository {
 
-    boolean save(Email email);
+    Email save(Email email);
 
     Email findById(String messageId);
 

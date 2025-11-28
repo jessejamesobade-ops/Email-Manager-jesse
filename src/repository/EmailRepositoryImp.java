@@ -17,9 +17,22 @@ public class EmailRepositoryImp implements EmailRepository {
         this.password = password;
     }
 
+    private Connection getConnection() throws SQLException{
+        return DriverManager.getConnection(url,username,password);
+    }
+
+    private Email mapRow(ResultSet rs) throws SQLException{
+        return new Email(
+          rs.getString("messageId"),
+                rs.getString("sender"),
+                rs.getString("subject"),
+                rs.getString("snippet"),
+                rs.getTimestamp("receive_at").toLocalDateTime()
+        );
+    }
 
     @Override
-    public boolean save(Email email) {
+    public Email save(Email email) {
         String sql = "INSERT INTO emails (message_Id, sender, subject, snippet, received_at) VALUES (?, ?, ?, ?, ?)";
 
         try(Connection conn = DriverManager.getConnection(url, username,password);
@@ -35,11 +48,14 @@ public class EmailRepositoryImp implements EmailRepository {
 
             System.out.println("connected [good]");
 
-            return affected > 0;
+            return affected > 0 ? email : null;
+
         } catch(SQLException e) {
-              e.printStackTrace();
+
+            //  e.printStackTrace();
             System.out.println("connected [ X ]");
-            return false;
+           // return null;
+            throw new RuntimeException("Failed to save email: "+ email.getMessageId(), e);
         }
     }
 
@@ -55,22 +71,17 @@ public class EmailRepositoryImp implements EmailRepository {
 
             try(ResultSet rs = stmt.executeQuery()){
                 if (rs.next()) {
-                    return new Email(
+                    return mapRow(rs);
 
-                            rs.getString("message_Id"),
-                            rs.getString("sender"),
-                            rs.getString("subject"),
-                            rs.getString("snippet"),
-                            rs.getTimestamp("received_at").toLocalDateTime()
-
-                    );
                 }
             }
             return  null;
 
         }catch (SQLException e){
-            e.printStackTrace();
-            return null;
+           // e.printStackTrace();
+            //return null;
+            throw new RuntimeException("Failed to find email by id: "+messageId, e);
+
         }
     }
 
@@ -86,19 +97,12 @@ public class EmailRepositoryImp implements EmailRepository {
             ResultSet rs = stmt.executeQuery()){
 
             while (rs.next()){
-                Email email = new Email(
-                        rs.getString("message_Id"),
-                        rs.getString("sender"),
-                        rs.getString("subject"),
-                        rs.getString("snippet"),
-                        rs.getTimestamp("received_at").toLocalDateTime());
-
-                 emails.add(email);
+                 emails.add(mapRow(rs));
               }
+            return emails;
             } catch (SQLException e){
-            e.printStackTrace();
+          throw new RuntimeException("Failed to fetch all emails", e);
         }
-        return emails;
     }
 
     @Override
@@ -106,7 +110,7 @@ public class EmailRepositoryImp implements EmailRepository {
 
         String sql = "DELETE FROM emails WHERE message_Id = ?";
 
-        try(Connection conn = DriverManager.getConnection(url, username, password);
+        try(Connection conn = getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)){
 
             stmt.setString(1, messageId);
@@ -115,8 +119,7 @@ public class EmailRepositoryImp implements EmailRepository {
             return affected > 0;
 
         }catch(SQLException e){
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("Failed to delete email"+ messageId, e);
         }
     }
 }
